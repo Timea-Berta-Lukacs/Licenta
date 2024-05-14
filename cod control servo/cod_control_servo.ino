@@ -14,8 +14,6 @@ Adafruit_PWMServoDriver Servo = Adafruit_PWMServoDriver();
 
 RF24 radio(9, 8); 
 
-bool isAttached = false;
-
 const uint64_t pipe_arduino2 = 0xE8E8F0F0E2LL;
 unsigned char commandType = 0;
 unsigned char buffer[2];
