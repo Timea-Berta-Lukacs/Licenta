@@ -15,10 +15,10 @@ Adafruit_PWMServoDriver Servo = Adafruit_PWMServoDriver();
 RF24 radio(9, 8); 
 
 const uint64_t pipe_arduino2 = 0xE8E8F0F0E2LL;
-unsigned char commandType = 0;
+unsigned char tipComanda = 0;
 unsigned char buffer[2];
-int previousTiltState = LOW;
-int currentTiltState;
+int starePrecedentaUnghi = LOW;
+int stareCurentaUnghi;
 
 void setup() {
   Serial.begin(115200);
@@ -39,26 +39,26 @@ void loop() {
   {  
     delay(1);
     radio.read(&buffer, 2);
-    commandType = buffer[0];
-    currentTiltState = buffer[1];
+    tipComanda = buffer[0];
+    stareCurentaUnghi = buffer[1];
   }
-  Serial.print(commandType);
+  Serial.print(tipComanda);
   Serial.print("\n");
-  if (previousTiltState == LOW && currentTiltState == HIGH) {
+  if (starePrecedentaUnghi == LOW && stareCurentaUnghi == HIGH) {
     Serial.print("1\n");
     Servo.setPWM(9, 0, 125);
     delay(500);
     Servo.setPWM(9, 0, 0);
   }
-  else if (previousTiltState == HIGH && currentTiltState == LOW) {
+  else if (starePrecedentaUnghi == HIGH && stareCurentaUnghi == LOW) {
     Serial.print("0\n");
     Servo.setPWM(9, 0, 575);
     delay(500);
     Servo.setPWM(9, 0, 0);
   }
-  previousTiltState = currentTiltState;
+  starePrecedentaUnghi = stareCurentaUnghi;
 
-  switch (commandType) {
+  switch (tipComanda) {
     case 1:
         Servo.setPWM(1, 0, 125);
         delay(10);
