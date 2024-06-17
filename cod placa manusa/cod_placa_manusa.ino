@@ -7,40 +7,39 @@
 #define CSN_GPIO    9
 #define CE_GPIO     10
 
-const int buttonPin = 2;
-const int ledPin = 6;
-int buttonState = 0;
-int tiltsensor = 4;
+const int pinButon = 2;
+const int pinLED = 6;
+int pinSenzorInclinare = 4;
 
 RF24 radio(CE_GPIO, CSN_GPIO);
-MPU6050 accelgyro;
+MPU6050 senzorAccelGiro;
 
 int16_t accelX, accelY, accelZ;
 int16_t giroX, giroY, giroZ;
 
 const uint64_t pipe_arduino1 = 0xE8E8F0F0E1LL;
 const uint64_t pipe_arduino2 = 0xE8E8F0F0E2LL;
-unsigned char commandType = 0;
-unsigned char speed = 0;
-unsigned char isEnable = 0;
-unsigned char buttonPress = 0;
+unsigned char tipComanda = 0;
+unsigned char viteza = 0;
+unsigned char activ = 0;
+unsigned char stareButon = 0;
 unsigned char buffer[2];
 
 void setup() {
   Serial.begin(115200);
-  pinMode(ledPin, OUTPUT);
-  pinMode(buttonPin, INPUT);
-  pinMode(tiltsensor, INPUT);
+  pinMode(pinLED, OUTPUT);
+  pinMode(pinButon, INPUT);
+  pinMode(pinSenzorInclinare, INPUT);
   
   radio.begin();
   radio.openWritingPipe(pipe_arduino1);
   radio.openWritingPipe(pipe_arduino2);
   radio.setPALevel(RF24_PA_MAX);
   radio.stopListening();
-  radio.write(&commandType, sizeof(commandType));
+  radio.write(&tipComanda, sizeof(tipComanda));
 
   Wire.begin();
-  accelgyro.initialize();
+  senzorAccelGiro.initialize();
 
   buffer[0] = 0;
   buffer[1] = 0;  
@@ -48,23 +47,23 @@ void setup() {
 
 void loop()
 {
-  accelgyro.getMotion6(&accelX, &accelY, &accelZ, &giroX, &giroY, &giroZ);
- if(!(PIND & 0x04)&&(buttonPress==0))
+  senzorAccelGiro.getMotion6(&accelX, &accelY, &accelZ, &giroX, &giroY, &giroZ);
+ if(!(PIND & 0x04)&&(stareButon==0))
   {
-      buttonPress = 1;
-      if(isEnable==0)
+      stareButon = 1;
+      if(activ==0)
       {
-        isEnable = 1;
+        activ = 1;
       }
       else
       {
-        isEnable = 0;
+        activ = 0;
         PORTD &= 0xF7;
       }
   }
-  else if((PIND & 0x04)&&(buttonPress==1))
+  else if((PIND & 0x04)&&(stareButon==1))
   {
-    buttonPress = 0;
+    stareButon = 0;
   }
 
   if((accelY<=-4000)||((accelY>=4000)))
@@ -73,28 +72,28 @@ void loop()
     {
       if((accelY<=-4000))
       {
-          commandType = 1;
-          speed = (accelY + 4000)/-2000 + 1;
-          if(speed>5)
+          tipComanda = 1;
+          viteza = (accelY + 4000)/-2000 + 1;
+          if(viteza>5)
           {
-            speed = 5;  
+            viteza = 5;  
           }
       }
 
       if((accelY>=4000))
       {
-          commandType = 2;
-          speed = (accelY - 4000)/2000 + 1;
-          if(speed>5)
+          tipComanda = 2;
+          viteza = (accelY - 4000)/2000 + 1;
+          if(viteza>5)
           {
-            speed = 5;  
+            viteza = 5;  
           }
       }
     }
     else
     {
-        commandType = 0;
-        speed = 0;
+        tipComanda = 0;
+        viteza = 0;
     } 
   }
   else if((accelX<=-4000)||((accelX>=4000)))
@@ -103,50 +102,50 @@ void loop()
     {
       if((accelX<=-4000))
       {
-          commandType = 4;
-          speed = (accelX + 4000)/-2000 + 1;
-          if(speed>5)
+          tipComanda = 4;
+          viteza = (accelX + 4000)/-2000 + 1;
+          if(viteza>5)
           {
-            speed = 5;  
+            viteza = 5;  
           }
       }
 
       if((accelX>=4000))
       {
-          commandType = 3;
-          speed = (accelX - 4000)/2000 + 1;
-          if(speed>5)
+          tipComanda = 3;
+          viteza = (accelX - 4000)/2000 + 1;
+          if(viteza>5)
           {
-            speed = 5;  
+            viteza = 5;  
           }
       }
     }
     else
     {
-        commandType = 0;
-        speed = 0;
+        tipComanda = 0;
+        viteza = 0;
     } 
   }
   else
   {
-      commandType = 0;
-      speed = 0;
+      tipComanda = 0;
+      viteza = 0;
   }
-  if(isEnable)
+  if(activ)
   {
     radio.openWritingPipe(pipe_arduino1);
-    buffer[0] = commandType;
-    buffer[1] = speed;
+    buffer[0] = tipComanda;
+    buffer[1] = viteza;
     radio.write(&buffer, 2);
-    digitalWrite(ledPin, HIGH);
+    digitalWrite(pinLED, HIGH);
   }
   else
   {
     radio.openWritingPipe(pipe_arduino2);
-    buffer[0] = commandType;
-    buffer[1] = digitalRead(tiltsensor);
+    buffer[0] = tipComanda;
+    buffer[1] = digitalRead(pinSenzorInclinare);
     radio.write(&buffer, 2);
-    digitalWrite(ledPin, LOW);
+    digitalWrite(pinLED, LOW);
   }
    delay(100);
 }

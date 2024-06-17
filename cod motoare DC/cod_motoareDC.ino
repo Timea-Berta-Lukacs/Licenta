@@ -10,11 +10,11 @@
 RF24 radio(8, 9); 
 
 const uint64_t pipe_arduino1 = 0xE8E8F0F0E1LL;
-unsigned char commandType = 0;
-unsigned char speed = 0;
+unsigned char tipComanda = 0;
+unsigned char viteza = 0;
 unsigned char stop = 0;
 unsigned char buffer[2];
-unsigned int stopCounter = 0;
+unsigned int contorOprire = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -34,8 +34,8 @@ void loop()
   {  
     delay(1);
     radio.read(&buffer, 2);
-    commandType = buffer[0];
-    speed = buffer[1];
+    tipComanda = buffer[0];
+    viteza = buffer[1];
   }
   if(stop==0)
   {
@@ -43,23 +43,23 @@ void loop()
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, LOW);
-    stopCounter++;
-    if(stopCounter>=((5-speed)*100))
+    contorOprire++;
+    if(contorOprire>=((5-viteza)*100))
    {
-      stopCounter = 0;
+      contorOprire = 0;
       stop = 1;
     }
   }
   else if(stop==1)
   {
-    stopCounter++;
-    if(stopCounter>=((speed)*100))
+    contorOprire++;
+    if(contorOprire>=((viteza)*100))
     {
-      stopCounter = 0;
+      contorOprire = 0;
       stop = 0;
     }
     
-    if(commandType == 1)
+    if(tipComanda == 1)
     {
       digitalWrite(IN1, HIGH);
       digitalWrite(IN2, LOW);
@@ -67,28 +67,28 @@ void loop()
       digitalWrite(IN4, LOW);
 
     }
-    else if(commandType == 2)
+    else if(tipComanda == 2)
     {
       digitalWrite(IN1, LOW);
       digitalWrite(IN2, HIGH);
       digitalWrite(IN3, LOW);
       digitalWrite(IN4, HIGH);
     }
-    else if(commandType == 4)
+    else if(tipComanda == 4)
     {
        digitalWrite(IN1, HIGH);
        digitalWrite(IN2, LOW);
        digitalWrite(IN3, LOW);
        digitalWrite(IN4, HIGH);
     }
-    else if(commandType == 3)
+    else if(tipComanda == 3)
     {
       digitalWrite(IN1, LOW);
       digitalWrite(IN2, HIGH);
       digitalWrite(IN3, HIGH);
       digitalWrite(IN4, LOW);
     }
-    else if(commandType == 0)
+    else if(tipComanda == 0)
     {      
       digitalWrite(IN1, LOW);
       digitalWrite(IN2, LOW);
