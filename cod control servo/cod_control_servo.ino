@@ -7,11 +7,6 @@
 
 Adafruit_PWMServoDriver Servo = Adafruit_PWMServoDriver();
 
-#define IN1  2
-#define IN2  3
-#define IN3  4
-#define IN4  5
-
 RF24 radio(9, 8); 
 
 const uint64_t pipe_arduino2 = 0xE8E8F0F0E2LL;
@@ -22,10 +17,6 @@ int stareCurentaUnghi;
 
 void setup() {
   Serial.begin(115200);
-  pinMode(IN1, OUTPUT);
-  pinMode(IN2, OUTPUT);
-  pinMode(IN3, OUTPUT);
-  pinMode(IN4, OUTPUT);
   radio.begin();
   radio.openReadingPipe(1, pipe_arduino2);
   radio.setPALevel(RF24_PA_MIN);
