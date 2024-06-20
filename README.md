@@ -1,4 +1,5 @@
 Link github: https://github.com/Timea-Berta-Lukacs/Licenta.git
+Link gitlab: https://gitlab.upt.ro/timea.lukacs/Licenta
 
 Pași de rulare:
 1. Se conecrează fiecare placă Arduino în parte la sursa de alimentare și anume bateria externă.
